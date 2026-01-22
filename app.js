@@ -187,15 +187,30 @@ function setupEventListeners() {
 // =============================================
 
 function openAddFoodModal() {
-    resetAddFoodForm();
-    elements.addFoodModal.classList.add('active');
-    showPrimaryPanel();
-    setTimeout(() => elements.proteinInput.focus(), 300);
+    // Pre-set panel state before opening (no animation needed)
+    elements.panelSecondary.classList.add('hidden');
+    elements.panelSecondary.classList.remove('panel-exit', 'panel-enter');
+    elements.panelPrimary.classList.remove('hidden', 'panel-exit', 'panel-enter');
+
+    // Clear inputs
+    elements.proteinInput.value = '';
+    elements.caloriesInput.value = '';
+    elements.nameInput.value = '';
+    elements.amountInput.value = '1';
+    elements.btnDone.disabled = true;
+
+    // Use requestAnimationFrame for smooth opening
+    requestAnimationFrame(() => {
+        elements.addFoodModal.classList.add('active');
+        // Focus after transition starts
+        requestAnimationFrame(() => {
+            elements.proteinInput.focus();
+        });
+    });
 }
 
 function closeAddFoodModal() {
     elements.addFoodModal.classList.remove('active');
-    resetAddFoodForm();
 }
 
 function openSettingsModal() {
@@ -232,33 +247,44 @@ function closeAllModals() {
 // =============================================
 
 function showSecondaryPanel() {
-    elements.panelPrimary.classList.add('fade-out');
+    // Single smooth transition using CSS
+    elements.panelPrimary.classList.add('panel-exit');
+    elements.panelSecondary.classList.add('panel-enter');
+    elements.panelSecondary.classList.remove('hidden');
 
-    setTimeout(() => {
+    // Use transitionend for precise timing
+    const onTransitionEnd = () => {
         elements.panelPrimary.classList.add('hidden');
-        elements.panelPrimary.classList.remove('fade-out');
-        elements.panelSecondary.classList.remove('hidden');
-        elements.panelSecondary.classList.add('fade-in');
+        elements.panelPrimary.classList.remove('panel-exit');
+        elements.panelSecondary.classList.remove('panel-enter');
+        elements.panelPrimary.removeEventListener('transitionend', onTransitionEnd);
+        elements.nameInput.focus();
+    };
 
-        setTimeout(() => {
-            elements.panelSecondary.classList.remove('fade-in');
-        }, 300);
-    }, 150);
+    elements.panelPrimary.addEventListener('transitionend', onTransitionEnd, { once: true });
+
+    // Fallback timeout in case transitionend doesn't fire
+    setTimeout(onTransitionEnd, 200);
 }
 
 function showPrimaryPanel() {
-    elements.panelSecondary.classList.add('fade-out');
+    // Single smooth transition using CSS
+    elements.panelSecondary.classList.add('panel-exit');
+    elements.panelPrimary.classList.add('panel-enter');
+    elements.panelPrimary.classList.remove('hidden');
 
-    setTimeout(() => {
+    // Use transitionend for precise timing
+    const onTransitionEnd = () => {
         elements.panelSecondary.classList.add('hidden');
-        elements.panelSecondary.classList.remove('fade-out');
-        elements.panelPrimary.classList.remove('hidden');
-        elements.panelPrimary.classList.add('fade-in');
+        elements.panelSecondary.classList.remove('panel-exit');
+        elements.panelPrimary.classList.remove('panel-enter');
+        elements.panelSecondary.removeEventListener('transitionend', onTransitionEnd);
+    };
 
-        setTimeout(() => {
-            elements.panelPrimary.classList.remove('fade-in');
-        }, 300);
-    }, 150);
+    elements.panelSecondary.addEventListener('transitionend', onTransitionEnd, { once: true });
+
+    // Fallback timeout in case transitionend doesn't fire
+    setTimeout(onTransitionEnd, 200);
 }
 
 function resetAddFoodForm() {
@@ -266,7 +292,10 @@ function resetAddFoodForm() {
     elements.caloriesInput.value = '';
     elements.nameInput.value = '';
     elements.amountInput.value = '1';
-    showPrimaryPanel();
+    // Reset panels without animation
+    elements.panelSecondary.classList.add('hidden');
+    elements.panelSecondary.classList.remove('panel-exit', 'panel-enter');
+    elements.panelPrimary.classList.remove('hidden', 'panel-exit', 'panel-enter');
     updateDoneButtonState();
 }
 
@@ -363,15 +392,34 @@ function toggleDifferenceView() {
 function renderFoodList() {
     elements.foodList.innerHTML = '';
 
-    state.foods.forEach(food => {
+    state.foods.forEach((food, index) => {
         const item = document.createElement('div');
         item.className = 'food-item';
         item.innerHTML = `
-            <span class="food-name">${escapeHtml(food.displayName)}:</span> 
-            ${Math.round(food.protein)}g, ${Math.round(food.calories)} cals
+            <div class="food-info">
+                <span class="food-name">${escapeHtml(food.displayName)}:</span> 
+                ${Math.round(food.protein)}g, ${Math.round(food.calories)} cals
+            </div>
+            <button class="delete-btn" aria-label="Delete food" data-index="${index}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
+            </button>
         `;
+
+        item.querySelector('.delete-btn').addEventListener('click', () => removeFood(index));
+
         elements.foodList.appendChild(item);
     });
+}
+
+function removeFood(index) {
+    state.foods.splice(index, 1);
+    saveToStorage();
+    renderFoodList();
+    updateTotalsDisplay();
 }
 
 // =============================================
@@ -482,7 +530,7 @@ async function handleAISend() {
     Analyze the user's input and extract food items with their protein (in grams) and calories.
     Respond ONLY with a strict JSON array of objects, like this:
     [{"name": "Food Name", "protein": 10, "calories": 200}, ...]
-    CRITICAL: For items like "chicken breast", "steak", or "fruit", use the standard size for ONE WHOLE UNIT (e.g., ~200-250g for a large chicken breast) rather than a 100g default, unless specified.
+    CRITICAL: For items like "chicken breast", "steak", or "fruit", use the standard size for ONE WHOLE UNIT rather than a 100g default, unless specified.
     Always prioritize "per unit" or "per serving" estimates.
     If amounts are specified (e.g. "2 eggs"), calculate the total for that amount.`;
 

@@ -188,28 +188,23 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding-top: 0;
+    padding-top: 3rem;
 }
 
 .totals-display {
     text-align: center;
-    padding: 1.5rem;
+    padding: 1rem;
     cursor: pointer;
     transition: all var(--transition-medium);
     border-radius: 16px;
+    margin-bottom: 3rem;
+    /* Same as the top padding for uniform spacing */
 }
 
-.totals-display:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.totals-display:active {
-    transform: scale(0.98);
-}
+/* Removed hover/active states for big text */
 
 .totals-text {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 700;
     letter-spacing: -0.04em;
     background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
@@ -241,13 +236,15 @@ body {
 /* Food List */
 .food-list {
     flex: 0 1 auto;
-    max-height: 40vh;
+    max-height: 45vh;
     overflow-y: auto;
     padding: 1rem 0.5rem;
-    margin-top: 2rem;
 }
 
 .food-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0.875rem 1rem;
     color: var(--text-secondary);
     font-size: 0.95rem;
@@ -256,6 +253,36 @@ body {
     background: rgba(255, 255, 255, 0.02);
     transition: all var(--transition-fast);
     animation: fadeSlideIn 0.3s ease-out;
+}
+
+.food-info {
+    flex: 1;
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    margin-right: -0.25rem;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+    opacity: 0.6;
+}
+
+.delete-btn:hover {
+    color: var(--danger-color);
+    background: rgba(250, 112, 154, 0.1);
+    opacity: 1;
+}
+
+.delete-btn svg {
+    width: 18px;
+    height: 18px;
 }
 
 @keyframes fadeSlideIn {
@@ -272,6 +299,10 @@ body {
 
 .food-item:hover {
     background: rgba(255, 255, 255, 0.05);
+}
+
+.food-item:hover .delete-btn {
+    opacity: 0.8;
 }
 
 .food-name {
@@ -294,7 +325,9 @@ body {
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: all var(--transition-medium);
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    will-change: opacity, visibility;
+    contain: layout style;
 }
 
 .modal-overlay.active {
@@ -305,9 +338,17 @@ body {
 .modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.92);
+    /* Removed expensive backdrop-filter on mobile - use solid background instead */
+    /* backdrop-filter applied only on larger screens for performance */
+}
+
+@media (min-width: 768px) {
+    .modal-backdrop {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
 }
 
 .modal-content {
@@ -319,12 +360,16 @@ body {
     padding: 2rem 1.5rem;
     box-shadow: var(--shadow-soft), var(--shadow-glow);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    transform: scale(0.9) translateY(20px);
-    transition: all var(--transition-medium);
+    transform: scale(0.95) translateY(10px);
+    opacity: 0;
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease;
+    will-change: transform, opacity;
+    contain: layout style paint;
 }
 
 .modal-overlay.active .modal-content {
     transform: scale(1) translateY(0);
+    opacity: 1;
 }
 
 /* =============================================
@@ -332,29 +377,23 @@ body {
    ============================================= */
 
 .modal-panel {
-    transition: all var(--transition-medium);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    will-change: opacity, transform;
 }
 
 .modal-panel.hidden {
     display: none;
 }
 
-.modal-panel.fade-out {
+.modal-panel.panel-exit {
     opacity: 0;
+    transform: translateX(-10px);
+    pointer-events: none;
 }
 
-.modal-panel.fade-in {
-    animation: panelFadeIn 0.3s ease-out;
-}
-
-@keyframes panelFadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+.modal-panel.panel-enter {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .input-section {
