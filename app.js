@@ -174,6 +174,13 @@ function setupEventListeners() {
         });
     });
 
+    // Auto-select text on focus for all number inputs (solves cursor annoyance)
+    document.querySelectorAll('input[type="number"], input[type="text"], textarea').forEach(input => {
+        input.addEventListener('focus', () => {
+            setTimeout(() => input.select(), 0);
+        });
+    });
+
     // Keyboard handling
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -196,7 +203,7 @@ function openAddFoodModal() {
     elements.proteinInput.value = '';
     elements.caloriesInput.value = '';
     elements.nameInput.value = '';
-    elements.amountInput.value = '1';
+    elements.amountInput.value = '';
     elements.btnDone.disabled = true;
 
     // Use requestAnimationFrame for smooth opening
@@ -301,7 +308,7 @@ function resetAddFoodForm() {
     elements.proteinInput.value = '';
     elements.caloriesInput.value = '';
     elements.nameInput.value = '';
-    elements.amountInput.value = '1';
+    elements.amountInput.value = '';
     // Reset panels without animation
     elements.panelSecondary.classList.add('hidden');
     elements.panelSecondary.classList.remove('exit-left', 'exit-right', 'enter-left', 'enter-right');
