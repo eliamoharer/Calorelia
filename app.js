@@ -189,8 +189,8 @@ function setupEventListeners() {
 function openAddFoodModal() {
     // Pre-set panel state before opening (no animation needed)
     elements.panelSecondary.classList.add('hidden');
-    elements.panelSecondary.classList.remove('panel-exit', 'panel-enter');
-    elements.panelPrimary.classList.remove('hidden', 'panel-exit', 'panel-enter');
+    elements.panelSecondary.classList.remove('exit-left', 'exit-right', 'enter-left', 'enter-right');
+    elements.panelPrimary.classList.remove('hidden', 'exit-left', 'exit-right', 'enter-left', 'enter-right');
 
     // Clear inputs
     elements.proteinInput.value = '';
@@ -247,44 +247,54 @@ function closeAllModals() {
 // =============================================
 
 function showSecondaryPanel() {
-    // Single smooth transition using CSS
-    elements.panelPrimary.classList.add('panel-exit');
-    elements.panelSecondary.classList.add('panel-enter');
-    elements.panelSecondary.classList.remove('hidden');
+    elements.panelPrimary.classList.add('exit-left');
 
-    // Use transitionend for precise timing
+    // Prepare secondary panel
+    elements.panelSecondary.classList.remove('hidden');
+    elements.panelSecondary.classList.add('enter-right');
+
+    // Trigger transition
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            elements.panelSecondary.classList.remove('enter-right');
+        });
+    });
+
     const onTransitionEnd = () => {
+        if (!elements.panelPrimary.classList.contains('exit-left')) return;
         elements.panelPrimary.classList.add('hidden');
-        elements.panelPrimary.classList.remove('panel-exit');
-        elements.panelSecondary.classList.remove('panel-enter');
+        elements.panelPrimary.classList.remove('exit-left');
         elements.panelPrimary.removeEventListener('transitionend', onTransitionEnd);
         elements.nameInput.focus();
     };
 
     elements.panelPrimary.addEventListener('transitionend', onTransitionEnd, { once: true });
-
-    // Fallback timeout in case transitionend doesn't fire
-    setTimeout(onTransitionEnd, 200);
+    setTimeout(onTransitionEnd, 300);
 }
 
 function showPrimaryPanel() {
-    // Single smooth transition using CSS
-    elements.panelSecondary.classList.add('panel-exit');
-    elements.panelPrimary.classList.add('panel-enter');
-    elements.panelPrimary.classList.remove('hidden');
+    elements.panelSecondary.classList.add('exit-right');
 
-    // Use transitionend for precise timing
+    // Prepare primary panel
+    elements.panelPrimary.classList.remove('hidden');
+    elements.panelPrimary.classList.add('enter-left');
+
+    // Trigger transition
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            elements.panelPrimary.classList.remove('enter-left');
+        });
+    });
+
     const onTransitionEnd = () => {
+        if (!elements.panelSecondary.classList.contains('exit-right')) return;
         elements.panelSecondary.classList.add('hidden');
-        elements.panelSecondary.classList.remove('panel-exit');
-        elements.panelPrimary.classList.remove('panel-enter');
+        elements.panelSecondary.classList.remove('exit-right');
         elements.panelSecondary.removeEventListener('transitionend', onTransitionEnd);
     };
 
     elements.panelSecondary.addEventListener('transitionend', onTransitionEnd, { once: true });
-
-    // Fallback timeout in case transitionend doesn't fire
-    setTimeout(onTransitionEnd, 200);
+    setTimeout(onTransitionEnd, 300);
 }
 
 function resetAddFoodForm() {
@@ -294,8 +304,8 @@ function resetAddFoodForm() {
     elements.amountInput.value = '1';
     // Reset panels without animation
     elements.panelSecondary.classList.add('hidden');
-    elements.panelSecondary.classList.remove('panel-exit', 'panel-enter');
-    elements.panelPrimary.classList.remove('hidden', 'panel-exit', 'panel-enter');
+    elements.panelSecondary.classList.remove('exit-left', 'exit-right', 'enter-left', 'enter-right');
+    elements.panelPrimary.classList.remove('hidden', 'exit-left', 'exit-right', 'enter-left', 'enter-right');
     updateDoneButtonState();
 }
 

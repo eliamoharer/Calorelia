@@ -364,7 +364,12 @@ body {
     opacity: 0;
     transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease;
     will-change: transform, opacity;
-    contain: layout style paint;
+
+    /* Grid stacking to prevent jitter */
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    align-items: start;
 }
 
 .modal-overlay.active .modal-content {
@@ -377,23 +382,57 @@ body {
    ============================================= */
 
 .modal-panel {
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    grid-column: 1;
+    grid-row: 1;
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
+    width: 100%;
 }
 
 .modal-panel.hidden {
     display: none;
 }
 
-.modal-panel.panel-exit {
+/* Forward Animation (Right to Left) */
+.modal-panel.exit-left {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-20px);
     pointer-events: none;
 }
 
-.modal-panel.panel-enter {
-    opacity: 1;
-    transform: translateX(0);
+.modal-panel.enter-right {
+    opacity: 0;
+    transform: translateX(20px);
+    display: block !important;
+}
+
+/* Backward Animation (Left to Right) */
+.modal-panel.exit-right {
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+.modal-panel.enter-left {
+    opacity: 0;
+    transform: translateX(-20px);
+    display: block !important;
+}
+
+/* Secondary Panel Right Alignment */
+#panelSecondary .input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+#panelSecondary .input-field {
+    justify-content: flex-end;
+}
+
+#panelSecondary input {
+    text-align: right;
 }
 
 .input-section {
