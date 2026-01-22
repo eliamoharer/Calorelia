@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Calorelia - Elegant calorie and protein tracking">
+    <title>Calorelia</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header with animated icons -->
+        <header class="icon-header">
+            <div class="icon-container">
+                <button class="icon-btn icon-ai" id="iconAI" aria-label="AI Food Scanner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                    </svg>
+                </button>
+                <button class="icon-btn icon-add" id="iconAdd" aria-label="Add Food">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+                <button class="icon-btn icon-settings" id="iconSettings" aria-label="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z" />
+                        <path d="M9 9h6M9 13h6M9 17h4" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main display area -->
+        <main class="main-content">
+            <div class="totals-display" id="totalsDisplay">
+                <span class="totals-text" id="totalsText">0g, 0 cals</span>
+            </div>
+            <div class="food-list" id="foodList">
+                <!-- Food items will be inserted here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Food Modal -->
+    <div class="modal-overlay" id="addFoodModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content add-food-modal">
+            <!-- Panel 1: Protein & Calories -->
+            <div class="modal-panel panel-primary" id="panelPrimary">
+                <div class="input-section">
+                    <label class="input-label">Protein</label>
+                    <div class="input-field">
+                        <input type="number" id="proteinInput" inputmode="decimal" placeholder="0" min="0" step="any">
+                        <span class="input-suffix">g</span>
+                    </div>
+                </div>
+                <div class="panel-divider">
+                    <button class="panel-arrow" id="arrowToSecondary" aria-label="More options">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-section">
+                    <label class="input-label">Calories</label>
+                    <div class="input-field">
+                        <input type="number" id="caloriesInput" inputmode="decimal" placeholder="0" min="0" step="any">
+                        <span class="input-suffix">cals</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2: Name & Amount -->
+            <div class="modal-panel panel-secondary hidden" id="panelSecondary">
+                <div class="input-section">
+                    <label class="input-label">Name</label>
+                    <div class="input-field">
+                        <input type="text" id="nameInput" placeholder="Optional">
+                        <span class="input-suffix">.</span>
+                    </div>
+                </div>
+                <div class="panel-divider">
+                    <button class="panel-arrow panel-arrow-back" id="arrowToPrimary" aria-label="Back">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-section">
+                    <label class="input-label">Amount</label>
+                    <div class="input-field">
+                        <input type="number" id="amountInput" inputmode="decimal" placeholder="1" min="0.01" step="any"
+                            value="1">
+                        <span class="input-suffix">.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Buttons -->
+        <div class="modal-buttons">
+            <button class="modal-btn btn-done" id="btnDone">Done</button>
+            <button class="modal-btn btn-cancel" id="btnCancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content settings-modal">
+            <h2 class="settings-title">Daily Goal</h2>
+
+            <div class="settings-goals">
+                <div class="goal-input-row">
+                    <label class="goal-label">Protein:</label>
+                    <div class="goal-field">
+                        <input type="number" id="goalProteinInput" inputmode="decimal" placeholder="0" min="0"
+                            step="any">
+                        <span class="goal-suffix">g</span>
+                    </div>
+                </div>
+                <div class="goal-input-row">
+                    <label class="goal-label">Calories:</label>
+                    <div class="goal-field">
+                        <input type="number" id="goalCaloriesInput" inputmode="decimal" placeholder="0" min="0"
+                            step="any">
+                        <span class="goal-suffix">cals</span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <button class="reset-save-btn" id="btnResetSave">Reset & Save</button>
+
+            <div class="history-container" id="historyContainer">
+                <!-- History items will be inserted here -->
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="modal-btn btn-close" id="btnCloseSettings">Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="aiModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content ai-modal">
+            <!-- AI Input Panel -->
+            <div class="modal-panel ai-panel-input" id="aiPanelInput">
+                <div class="input-section ai-key-row">
+                    <label class="input-label">API Key:</label>
+                    <div class="input-field ai-key-field">
+                        <input type="password" id="apiKeyInput">
+                    </div>
+                </div>
+                <div class="input-section">
+                    <label class="input-label">What did you eat?</label>
+                    <textarea id="aiPromptInput" class="ai-textarea"
+                        placeholder="e.g., 2 eggs, a glass of milk, and some oats..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn btn-done" id="btnAISend">Send</button>
+                    <button class="modal-btn btn-cancel" id="btnAICancel">Cancel</button>
+                </div>
+            </div>
+
+            <!-- AI Result Panel -->
+            <div class="modal-panel ai-panel-result hidden" id="aiPanelResult">
+                <h2 class="ai-title">Confirm Items</h2>
+                <div class="ai-preview-list" id="aiPreviewList">
+                    <!-- Parsed items will appear here -->
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn btn-done" id="btnAIConfirm">Confirm</button>
+                    <button class="modal-btn btn-cancel" id="btnAIBack">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
