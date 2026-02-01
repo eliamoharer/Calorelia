@@ -58,7 +58,9 @@ const elements = {
     settingsModal: document.getElementById('settingsModal'),
     goalProteinInput: document.getElementById('goalProteinInput'),
     goalCaloriesInput: document.getElementById('goalCaloriesInput'),
-    btnResetSave: document.getElementById('btnResetSave'),
+    btnReset: document.getElementById('btnReset'),
+    btnGoalCheck: document.getElementById('btnGoalCheck'),
+    btnDownload: document.getElementById('btnDownload'),
     btnCloseSettings: document.getElementById('btnCloseSettings'),
     historyContainer: document.getElementById('historyContainer'),
 
@@ -152,7 +154,12 @@ function setupEventListeners() {
     elements.caloriesInput.addEventListener('input', updateDoneButtonState);
 
     // Settings Modal
-    elements.btnResetSave.addEventListener('click', handleResetAndSave);
+    elements.btnReset.addEventListener('click', handleResetAndSave);
+    elements.btnGoalCheck.addEventListener('click', () => {
+        elements.btnGoalCheck.style.transform = 'scale(1.2)';
+        setTimeout(() => elements.btnGoalCheck.style.transform = '', 200);
+    });
+    elements.btnDownload.addEventListener('click', downloadHistory);
     elements.btnCloseSettings.addEventListener('click', closeSettingsModal);
     elements.goalProteinInput.addEventListener('change', handleGoalChange);
     elements.goalCaloriesInput.addEventListener('change', handleGoalChange);
@@ -520,6 +527,21 @@ function renderHistory() {
 
         elements.historyContainer.appendChild(item);
     });
+}
+
+function downloadHistory() {
+    if (state.history.length === 0) {
+        alert('No history to download');
+        return;
+    }
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.history, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "calorelia_history.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
 }
 
 // =============================================
