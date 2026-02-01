@@ -140,7 +140,26 @@
 
 
 
-            <button class="reset-save-btn" id="btnResetSave">Reset & Save</button>
+            <div class="action-btns-row">
+                <button class="action-btn" id="btnReset" aria-label="Reset Day">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M21 12a9 9 0 11-9-9c2.52 0 4.85.83 6.72 2.24" />
+                        <path d="M21 3v9h-9" />
+                    </svg>
+                </button>
+                <button class="action-btn" id="btnGoalCheck" aria-label="Set Goal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </button>
+                <button class="action-btn" id="btnDownload" aria-label="Download History">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                </button>
+            </div>
 
             <div class="history-container" id="historyContainer">
                 <!-- History items will be inserted here -->
